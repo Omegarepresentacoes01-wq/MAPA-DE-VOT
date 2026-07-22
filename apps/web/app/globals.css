@@ -1,28 +1,28 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 :root {
-  --bg-base:       #f4f6f8;
-  --bg-surface:    #ffffff;
-  --bg-elevated:   #f8fafc;
-  --bg-overlay:    #edf1f5;
-  --border:        #dce3ea;
-  --border-subtle: #e9edf1;
-  --text-primary:  #17212b;
-  --text-secondary:#526170;
-  --text-muted:    #738191;
-  --accent:        #0d4d7a;
-  --accent-glow:   rgba(13, 77, 122, 0.10);
-  --accent-hover:  #083d63;
-  --accent-dim:    #2d668d;
+  --bg-base:       #080d14;
+  --bg-surface:    #151b24;
+  --bg-elevated:   #1a202a;
+  --bg-overlay:    #202735;
+  --border:        #2a3341;
+  --border-subtle: #202835;
+  --text-primary:  #eef3f8;
+  --text-secondary:#a6b2c3;
+  --text-muted:    #748196;
+  --accent:        #3b82f6;
+  --accent-glow:   rgba(59, 130, 246, .18);
+  --accent-hover:  #2563eb;
+  --accent-dim:    #162a4e;
 
   /* Status */
-  --success:       #23724d;
-  --success-dim:   #e8f4ed;
-  --warning:       #9a6308;
-  --warning-dim:   #fff4dc;
-  --danger:        #b33a3a;
-  --danger-dim:    #fceaea;
-  --info:          #186b99;
-  --info-dim:      #e8f3f9;
+  --success:       #32d7a0;
+  --success-dim:   #103d34;
+  --warning:       #f3c84b;
+  --warning-dim:   #493d1e;
+  --danger:        #ff6c70;
+  --danger-dim:    #48262d;
+  --info:          #45b6eb;
+  --info-dim:      #102f42;
 
   /* Partidos — gradiente político */
   --color-esquerda: hsl(0, 70%, 55%);
@@ -67,7 +67,7 @@
   --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* ── Sidebar ── */
-  --sidebar-width: 240px;
+  --sidebar-width: 366px;
   --topbar-height: 60px;
 }
 
@@ -436,6 +436,30 @@ a:hover { color: var(--accent-hover); }
 .action-row small { display: block; margin-top: .15rem; color: #82909a; font-size: .68rem; }
 @media (max-width: 980px) { .command-metrics { grid-template-columns: repeat(2, 1fr); } .command-grid { grid-template-columns: 1fr; } }
 @media (max-width: 650px) { .command-header { display: block; } .campaign-name { margin-top: 1rem; } .command-metrics { grid-template-columns: 1fr; } .command-form { grid-template-columns: 1fr 55px; } .command-form input[name="meta"], .command-form input[name="responsavel"] { grid-column: span 2; } .command-form .btn { grid-column: span 2; } .command-action-form { grid-template-columns: 1fr; } .command-action-form .btn { grid-column: auto; } .territory-row { grid-template-columns: 36px 1fr 25px; } .territory-progress { grid-column: 2; text-align: left; } }
+
+/* Referência operacional: superfície escura, densa e orientada a decisão */
+.command-center { max-width: 1520px; }
+.command-header { align-items:center; padding: .1rem 0 2rem; }
+.command-title-icon { display:grid; place-items:center; width:56px; height:56px; border-radius:14px; background:#10284a; color:#4ca7ff; margin-right:.15rem; }
+.command-header > div:nth-child(2) { margin-right:auto; }
+.command-eyebrow { color:#5b9cf6; }
+.command-header h1 { color:#f2f6fb; font-size:2.15rem; }
+.campaign-name input { background:#111824; border-color:#2b3645; color:#e5edf6; }
+.command-alert { border-color:#28536b; background:#0e2731; color:#a8d7e6; }
+.command-alert-dot { background:#43cf9d; }
+.command-metrics { grid-template-columns: repeat(4,1fr); gap:1rem; }
+.command-metric { min-height:126px; background:#171d27; border-color:#303a49; border-radius:14px; box-shadow:none; }
+.command-metric-icon { background:#102d40; color:#39c9eb; }
+.command-metric:nth-child(1) .command-metric-icon { background:#2f2530; color:#ff7478; }
+.command-metric:nth-child(2) .command-metric-icon { background:#103d34; color:#37d4a0; }
+.command-metric p { color:#8996a9; }.command-metric strong { color:#eef3f8; font-size:1.7rem; }.command-metric span { color:#8592a4; }
+.command-grid { gap:1.1rem; }
+.command-panel { min-height:410px; border-color:#303a49; border-radius:14px; background:#171d27; }
+.command-panel-head { padding:1.25rem 1.3rem; border-bottom-color:#293342; }.command-panel h2 { color:#eff4fa; font-size:1.04rem; }.command-panel-head p { color:#8794a5; }
+.command-add { border-color:#3a4759; border-radius:7px; background:#111720; color:#70adff; }.command-add:hover { background:#172b47; border-color:#3b82f6; }
+.command-form { background:#121923; border-bottom-color:#293342; }.command-form input,.command-form select { background:#0d131c; border-color:#334052; color:#e4ebf4; }
+.command-empty { border-color:#364150; background:#141b24; }.command-empty > span { background:#102d40; color:#48c9ed; }.command-empty strong { color:#e8eef5; }.command-empty p { color:#8f9bab; }
+.territory-row,.action-row { border-bottom-color:#293342; background:#171d27; }.action-row:hover { background:#1b2330; }.territory-pin { background:#173d56; }.territory-main strong,.action-row strong { color:#e8eef5; }.territory-main span,.action-row small { color:#8996a7; }.territory-progress div { background:#27313e; }.territory-menu { color:#93a1b2; }
 
 /* Animations */
 @keyframes fadeIn {

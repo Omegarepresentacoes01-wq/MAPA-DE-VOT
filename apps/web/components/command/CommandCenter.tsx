@@ -30,7 +30,9 @@ export function CommandCenter() {
   const summary = useMemo(() => {
     const meta = store.territories.reduce((total, item) => total + item.meta, 0);
     const realizado = store.territories.reduce((total, item) => total + item.realizado, 0);
-    return { meta, realizado, gap: Math.max(0, meta - realizado), actions: store.actions.filter((item) => !item.done).length };
+    const actions = store.actions.filter((item) => !item.done).length;
+    const score = Math.min(100, (store.territories.length ? 35 : 0) + (store.territories.some((item) => item.responsavel) ? 25 : 0) + (store.actions.length ? 20 : 0) + (store.actions.some((item) => item.done) ? 20 : 0));
+    return { meta, realizado, gap: Math.max(0, meta - realizado), actions, score };
   }, [store]);
 
   function addTerritory(event: FormEvent<HTMLFormElement>) {
@@ -59,17 +61,17 @@ export function CommandCenter() {
 
   return <div className="command-center">
     <header className="command-header">
-      <div><p className="command-eyebrow">OPERAÇÃO ELEITORAL · 2026</p><h1>Comando Central</h1><p>Território, metas e execução da equipe em um só lugar.</p></div>
+      <div className="command-title-icon"><Target size={28} /></div><div><p className="command-eyebrow">VISÃO CONSOLIDADA DA CAMPANHA</p><h1>Comando Central</h1><p>Saúde estratégica, território e execução da equipe.</p></div>
       <label className="campaign-name">Campanha <input value={store.campaign} onChange={(event) => setStore((current) => ({ ...current, campaign: event.target.value }))} /></label>
     </header>
 
     <section className="command-alert"><span className="command-alert-dot" /> Base eleitoral oficial ainda não foi importada. Os campos abaixo registram dados operacionais da sua equipe neste navegador.</section>
 
     <section className="command-metrics">
+      <Metric icon={<Target />} label="Score operacional" value={`${summary.score}/100`} detail={summary.score ? "calculado pela configuração" : "configure a operação"} />
       <Metric icon={<MapPinned />} label="Territórios ativos" value={store.territories.length} detail="municípios em acompanhamento" />
       <Metric icon={<Target />} label="Meta consolidada" value={number(summary.meta)} detail={summary.meta ? `${number(summary.gap)} votos para a meta` : "cadastre a primeira meta"} />
       <Metric icon={<Users />} label="Responsáveis" value={new Set(store.territories.map((item) => item.responsavel).filter(Boolean)).size} detail="pessoas vinculadas" />
-      <Metric icon={<ClipboardList />} label="Ações pendentes" value={summary.actions} detail="itens para execução" />
     </section>
 
     <section className="command-grid">

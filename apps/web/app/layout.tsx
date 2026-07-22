@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "./layout.css";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Topbar } from "@/components/layout/Topbar";
+import { PrivateShell } from "@/components/layout/PrivateShell";
 
 export const metadata: Metadata = {
   title: { default: "Mapa de Voto", template: "%s | Mapa de Voto" },
@@ -23,15 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body>
-        <div className="app-shell">
-          <Sidebar />
-          <div className="app-main">
-            <Topbar />
-            <main className="app-content">{children}</main>
-          </div>
-        </div>
-      </body>
+      <body><PrivateShell>{children}</PrivateShell></body>
     </html>
   );
 }
