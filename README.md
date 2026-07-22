@@ -90,6 +90,16 @@ Abra http://localhost:3000. O sistema mostra dados de demonstração identificad
 
 O acesso local usa inicialmente `admin@mapadevoto.local` e `mapa-local-2026`. Antes de disponibilizar o sistema a outra pessoa, defina `MAPA_ADMIN_EMAIL`, `MAPA_ADMIN_PASSWORD` e `MAPA_SESSION_SECRET` em um arquivo `.env.local` que não é versionado.
 
+### Primeira base oficial local — Rondônia 2022
+
+Sem Docker, importe o resultado oficial de Governador no 1º turno de 2022 para Rondônia com:
+
+```bash
+python3 scripts/import_tse_2022_ro.py
+```
+
+O comando baixa o CSV oficial do TSE quando necessário, cruza as geometrias municipais do IBGE e gera a base local usada em `/mapa`. Os arquivos brutos e derivados permanecem fora do Git.
+
 ## Estratégia territorial 2026
 
 O módulo Estratégia 2026 organiza municípios por prioridade, compara o desempenho histórico e registra metas e próximas ações. No modo local os valores são demonstrativos; o cálculo definitivo usará resultados históricos por município/zona disponibilizados pelo TSE.

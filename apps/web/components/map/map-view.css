@@ -13,3 +13,12 @@
 .maplibregl-ctrl-attrib { background:rgba(8,12,17,.82)!important; color:#8794a5!important; font-size:9px!important; }.maplibregl-ctrl-attrib a { color:#789cc7!important; }
 @media (max-width:1200px) { .map-insight-rail { width:245px; }.map-query-panel { width:330px; }.map-legend { left:265px; } }
 @media (max-width:900px) { .map-insight-rail { display:none; }.map-query-panel { width:320px; }.map-legend { left:1rem; }.electoral-map-shell { min-height:600px; }.map-toolbar { left:1rem; transform:none; }.map-toolbar button:not(.active) { font-size:0; padding:.55rem; }.map-toolbar button:not(.active) svg { width:17px; height:17px; } }
+
+.map-data-loaded { border-color:#1e6b55; background:#112b29; }
+.map-data-loaded div svg { color:#39d7a0; }
+.map-candidate-select { display:grid; gap:.35rem; color:#98a9b9; font-size:.66rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase; }
+.map-candidate-select select { width:100%; border:1px solid #38624f; border-radius:6px; background:#0e1c20; color:#e5edf4; padding:.62rem; font:600 .75rem var(--font-sans); }
+.map-candidate-ranking { margin-top:.75rem; border-top:1px solid #275547; padding-top:.55rem; }
+.map-candidate-ranking button { display:grid; grid-template-columns:20px 1fr auto; align-items:center; gap:.45rem; width:100%; border:0; border-radius:5px; background:transparent; color:#c7d5df; padding:.42rem .25rem; text-align:left; cursor:pointer; font:600 .69rem var(--font-sans); }
+.map-candidate-ranking button:hover,.map-candidate-ranking button.selected { background:#16403c; }
+.map-candidate-ranking b { color:#42d5a3; }.map-candidate-ranking span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.map-candidate-ranking small { color:#93a8a8; font-size:.65rem; }
