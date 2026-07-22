@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mapa-voto-db"
+version = "0.1.0"
+description = "Modelos SQLAlchemy + Alembic migrations — Mapa de Voto"
+requires-python = ">=3.12"
+dependencies = [
+    "mapa-voto-shared",
+    "sqlalchemy[asyncio]>=2.0",
+    "asyncpg>=0.29",
+    "psycopg2-binary>=2.9",
+    "geoalchemy2>=0.15",
+    "alembic>=1.13",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["db*"]

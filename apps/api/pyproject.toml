@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mapa-voto-api"
+version = "0.1.0"
+description = "API FastAPI — Mapa de Voto"
+requires-python = ">=3.12"
+dependencies = [
+    "mapa-voto-shared",
+    "mapa-voto-db",
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    "pydantic-settings>=2.3",
+    "redis[asyncio]>=5.0",
+    "meilisearch-python-sdk>=3.0",
+    "python-multipart>=0.0.9",
+    "httpx>=0.27",
+    "openpyxl>=3.1",
+    "reportlab>=4.2",
+    "orjson>=3.10",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "httpx>=0.27", "aiosqlite>=0.20", "anyio>=4"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["apps.api*"]

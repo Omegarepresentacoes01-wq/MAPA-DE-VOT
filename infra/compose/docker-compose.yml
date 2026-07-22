@@ -1,0 +1,177 @@
+services:
+
+  # ────────────────────────────────────────────────────────────────
+  # PostgreSQL 16 + PostGIS 3.4
+  # ────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: mapa_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-mapa_voto}
+      POSTGRES_USER: ${POSTGRES_USER:-mapa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme_strong_password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../docker/postgres-init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mapa} -d ${POSTGRES_DB:-mapa_voto}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ────────────────────────────────────────────────────────────────
+  # Redis 7
+  # ────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: mapa_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # ────────────────────────────────────────────────────────────────
+  # MinIO (S3-compatible raw storage)
+  # ────────────────────────────────────────────────────────────────
+  minio:
+    image: minio/minio:latest
+    container_name: mapa_minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-changeme_minio_secret}
+    ports:
+      - "9000:9000"
+      - "9001:9001"  # MinIO Console
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ────────────────────────────────────────────────────────────────
+  # Meilisearch
+  # ────────────────────────────────────────────────────────────────
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    container_name: mapa_meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_MASTER_KEY:-changeme_meili_key}
+      MEILI_ENV: development
+    ports:
+      - "7700:7700"
+    volumes:
+      - meilisearch_data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ────────────────────────────────────────────────────────────────
+  # pg_tileserv (MVT tiles from PostGIS)
+  # ────────────────────────────────────────────────────────────────
+  pg_tileserv:
+    image: pramsey/pg_tileserv:latest
+    container_name: mapa_tileserv
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: ${TILESERV_DATABASE_URL:-postgresql://mapa:changeme_strong_password@postgres:5432/mapa_voto}
+    ports:
+      - "7800:7800"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ────────────────────────────────────────────────────────────────
+  # FastAPI — API serving
+  # ────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/api.Dockerfile
+    container_name: mapa_api
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../../apps/api:/app/apps/api
+      - ../../packages:/app/packages
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      meilisearch:
+        condition: service_healthy
+    environment:
+      PYTHONPATH: /app/apps/api
+    command: uvicorn apps.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ────────────────────────────────────────────────────────────────
+  # Celery — async worker (ETL + exportações)
+  # ────────────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: ../..
+      dockerfile: infra/docker/worker.Dockerfile
+    container_name: mapa_worker
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ../../apps/worker:/app/apps/worker
+      - ../../packages:/app/packages
+      - ../../data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    command: celery -A apps.worker.celery_app worker --loglevel=info -Q default,etl,exports
+
+  # ────────────────────────────────────────────────────────────────
+  # Next.js — frontend
+  # ────────────────────────────────────────────────────────────────
+  web:
+    build:
+      context: ../../apps/web
+      dockerfile: ../../infra/docker/web.Dockerfile
+    container_name: mapa_web
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - api
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  meilisearch_data:
+
+networks:
+  default:
+    name: mapa_voto_network

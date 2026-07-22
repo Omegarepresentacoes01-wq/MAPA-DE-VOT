@@ -1,0 +1,121 @@
+.ficha360-hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 2rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.ficha360-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--accent);
+}
+
+.ficha360-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: none;
+  font-family: var(--font-sans);
+}
+
+.ficha360-hero-info { flex: 1; min-width: 0; }
+.ficha360-nome {
+  font-size: clamp(1.25rem, 3vw, 1.875rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  font-family: var(--font-sans);
+}
+.ficha360-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.ficha360-hero-votes {
+  text-align: right;
+  flex-shrink: 0;
+  padding-left: 1.5rem;
+  border-left: 1px solid var(--border);
+}
+
+/* Timeline */
+.ficha360-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--border);
+}
+.timeline-item {
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+.timeline-dot {
+  position: absolute;
+  left: -1.6rem;
+  top: 0.75rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--bg-base);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.timeline-card {
+  margin-left: 0.75rem;
+}
+.timeline-card:hover { border-color: var(--accent); }
+
+/* Search result card (usado em SearchResults) */
+.search-result-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: all var(--transition-fast);
+}
+.search-result-card:hover {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+  box-shadow: none;
+  transform: none;
+}
+.search-result-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.search-result-icon.candidato { background: var(--accent-glow); color: var(--accent); }
+.search-result-icon.municipio { background: var(--success-dim); color: var(--success); }
+.search-result-icon.partido   { background: var(--warning-dim); color: var(--warning); }
+.search-result-body { flex: 1; min-width: 0; }
+.search-result-title { font-size: var(--text-sm); font-weight: 600; color: var(--text-primary); display: block; }
+.search-result-sub   { font-size: var(--text-xs); color: var(--text-muted); display: block; margin-top: 2px; }
