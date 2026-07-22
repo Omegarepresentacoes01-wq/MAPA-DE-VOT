@@ -25,19 +25,6 @@ function safeEquals(left: string, right: string) {
   return mismatch === 0;
 }
 
-async function signature(email: string, secret: string) {
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey(
-    "raw",
-    encoder.encode(secret),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"],
-  );
-  const bytes = new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(email)));
-  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
 export function validateLocalAdmin(email: string, password: string) {
   const current = config();
   const validEmail = safeEquals(email, current.email);
@@ -45,16 +32,12 @@ export function validateLocalAdmin(email: string, password: string) {
   return validEmail && validPassword;
 }
 
-export async function createSessionValue(email: string) {
-  const { secret } = config();
-  return `${email}.${await signature(email, secret)}`;
+export function createSessionValue(email: string) {
+  // Sessão propositalmente simples para o modo local sem infraestrutura.
+  // Na VPS ela será substituída por sessão persistida e senha hasheada.
+  return `local:${email}`;
 }
 
-export async function hasValidSession(value?: string) {
-  if (!value) return false;
-  const separator = value.lastIndexOf(".");
-  const email = value.slice(0, separator);
-  const providedSignature = value.slice(separator + 1);
-  if (separator < 1 || email !== config().email) return false;
-  return safeEquals(providedSignature, await signature(email, config().secret));
+export function hasValidSession(value?: string) {
+  return safeEquals(value || "", createSessionValue(config().email));
 }
