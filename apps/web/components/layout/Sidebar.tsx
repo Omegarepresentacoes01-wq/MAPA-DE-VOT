@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Search, Map, Users, ArrowLeftRight, Download, Vote, ChevronRight } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 const navItems = [
   { href: "/", icon: Search, label: "Busca" },
@@ -13,6 +14,11 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+
+  async function logout() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    window.location.assign("/login");
+  }
 
   return (
     <aside className="sidebar">
@@ -44,6 +50,7 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="sidebar-footer">
+        <button className="nav-item" onClick={logout} style={{ marginBottom: "0.75rem" }}><LogOut size={16} /> Sair do sistema</button>
         <p className="sidebar-version">v0.1.0 · Dados TSE + IBGE</p>
       </div>
     </aside>

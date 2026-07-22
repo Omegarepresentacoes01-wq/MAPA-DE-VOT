@@ -88,6 +88,8 @@ make web
 
 Abra http://localhost:3000. O sistema mostra dados de demonstração identificados como tal; não há ingestão, persistência ou consulta aos dados oficiais nesse modo.
 
+O acesso local usa inicialmente `admin@mapadevoto.local` e `mapa-local-2026`. Antes de disponibilizar o sistema a outra pessoa, defina `MAPA_ADMIN_EMAIL`, `MAPA_ADMIN_PASSWORD` e `MAPA_SESSION_SECRET` em um arquivo `.env.local` que não é versionado.
+
 ---
 
 ## Fontes de dados

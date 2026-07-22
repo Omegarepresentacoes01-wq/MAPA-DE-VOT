@@ -352,6 +352,22 @@ a:hover { color: var(--accent-hover); }
 .tab:hover { color: var(--text-primary); }
 .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
 
+/* ── Login interno ── */
+.login-page { min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(420px, .9fr); background: var(--bg-base); }
+.login-brand { background: #102b42; color: white; padding: clamp(3rem, 9vw, 9rem); display: flex; flex-direction: column; justify-content: center; }
+.login-mark { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 10px; background: #d8a122; margin-bottom: 2rem; }
+.login-kicker { font-size: .7rem; letter-spacing: .16em; font-weight: 700; color: #aac0d0; }
+.login-brand h1 { font-size: clamp(2.25rem, 4vw, 3.75rem); line-height: 1.08; margin: 1rem 0; letter-spacing: -.04em; }
+.login-brand p { max-width: 32rem; color: #c4d2dc; font-size: 1.05rem; }
+.login-panel { display: grid; place-items: center; padding: 2rem; }
+.login-card { width: min(100%, 410px); background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; gap: .65rem; }
+.login-title { display: flex; gap: .75rem; align-items: flex-start; margin-bottom: 1rem; color: var(--accent); }
+.login-title h2 { color: var(--text-primary); font-size: 1.25rem; }
+.login-title p, .login-help { color: var(--text-muted); font-size: var(--text-sm); margin-top: .25rem; }
+.login-card .btn { margin-top: 1rem; justify-content: center; }
+.login-error { color: var(--danger); font-size: var(--text-sm); margin-top: .25rem; }
+@media (max-width: 800px) { .login-page { grid-template-columns: 1fr; } .login-brand { padding: 3rem 2rem; } .login-brand h1 { font-size: 2.25rem; } }
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
