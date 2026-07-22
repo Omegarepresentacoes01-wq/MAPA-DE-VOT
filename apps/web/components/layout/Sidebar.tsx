@@ -14,7 +14,7 @@ const navItems = [
 ];
 
 export function Sidebar() {
-  const pathname = usePathname();
+  const pathname = usePathname() || "";
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });

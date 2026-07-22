@@ -14,7 +14,7 @@ const PLACEHOLDERS = [
 export function SearchHero() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get("q") || "");
+  const [query, setQuery] = useState(searchParams?.get("q") || "");
   const [placeholder, setPlaceholder] = useState(PLACEHOLDERS[0]);
   const [pIdx, setPIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
