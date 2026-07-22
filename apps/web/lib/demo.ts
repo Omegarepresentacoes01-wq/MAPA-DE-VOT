@@ -88,3 +88,13 @@ export const DEMO_MUNICIPALITIES: Record<string, { nome: string; uf: string; pop
   "3534401": { nome: "Osasco", uf: "SP", populacao: 728615, votos_validos: 403670 },
   "3547809": { nome: "Santo André", uf: "SP", populacao: 748919, votos_validos: 434200 },
 };
+
+export type StrategyPriority = "alta" | "media" | "manutencao";
+
+export const DEMO_STRATEGY_2026 = [
+  { codigo: "3550308", municipio: "São Paulo", uf: "SP", prioridade: "alta" as StrategyPriority, votos2022: 72400, votos2024: 84350, variacao: 16.5, potencial: 112000, meta: 93000, status: "Planejar agenda" },
+  { codigo: "3518800", municipio: "Guarulhos", uf: "SP", prioridade: "alta" as StrategyPriority, votos2022: 16820, votos2024: 22310, variacao: 32.6, potencial: 31000, meta: 25500, status: "Ampliar presença" },
+  { codigo: "3534401", municipio: "Osasco", uf: "SP", prioridade: "alta" as StrategyPriority, votos2022: 12170, votos2024: 10980, variacao: -9.8, potencial: 19000, meta: 14500, status: "Recuperar base" },
+  { codigo: "3547809", municipio: "Santo André", uf: "SP", prioridade: "media" as StrategyPriority, votos2022: 9350, votos2024: 10920, variacao: 16.8, potencial: 14500, meta: 12000, status: "Consolidar" },
+  { codigo: "3304557", municipio: "Rio de Janeiro", uf: "RJ", prioridade: "media" as StrategyPriority, votos2022: 18750, votos2024: 16200, variacao: -13.6, potencial: 26000, meta: 20500, status: "Diagnosticar queda" },
+];

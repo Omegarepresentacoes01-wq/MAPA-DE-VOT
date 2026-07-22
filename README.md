@@ -90,6 +90,10 @@ Abra http://localhost:3000. O sistema mostra dados de demonstração identificad
 
 O acesso local usa inicialmente `admin@mapadevoto.local` e `mapa-local-2026`. Antes de disponibilizar o sistema a outra pessoa, defina `MAPA_ADMIN_EMAIL`, `MAPA_ADMIN_PASSWORD` e `MAPA_SESSION_SECRET` em um arquivo `.env.local` que não é versionado.
 
+## Estratégia territorial 2026
+
+O módulo Estratégia 2026 organiza municípios por prioridade, compara o desempenho histórico e registra metas e próximas ações. No modo local os valores são demonstrativos; o cálculo definitivo usará resultados históricos por município/zona disponibilizados pelo TSE.
+
 ---
 
 ## Fontes de dados

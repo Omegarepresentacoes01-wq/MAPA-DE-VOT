@@ -368,6 +368,22 @@ a:hover { color: var(--accent-hover); }
 .login-error { color: var(--danger); font-size: var(--text-sm); margin-top: .25rem; }
 @media (max-width: 800px) { .login-page { grid-template-columns: 1fr; } .login-brand { padding: 3rem 2rem; } .login-brand h1 { font-size: 2.25rem; } }
 
+/* ── Estratégia territorial ── */
+.strategy-notice { display: flex; align-items: center; gap: .5rem; padding: .75rem 1rem; border: 1px solid #c7d9e5; background: #f1f7fb; color: #28516c; border-radius: var(--radius); font-size: var(--text-sm); }
+.strategy-toolbar { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.strategy-toolbar .section-title::after { display: none; }
+.strategy-toolbar p { color: var(--text-muted); font-size: var(--text-sm); }
+.strategy-filter { display: flex; gap: .5rem; flex-wrap: wrap; }
+.strategy-sub { display: block; font-size: var(--text-xs); font-weight: 400; color: var(--text-muted); margin-top: .2rem; }
+.strategy-table td { white-space: nowrap; }
+.strategy-table td:first-child { white-space: normal; min-width: 180px; }
+.strategy-table td:nth-child(5) { display: table-cell; }
+.strategy-table td:nth-child(5) svg { vertical-align: -2px; margin-right: .2rem; }
+.strategy-priority.alta { background: var(--danger-dim); color: var(--danger); }
+.strategy-priority.media { background: var(--warning-dim); color: var(--warning); }
+.strategy-priority.manutencao { background: var(--info-dim); color: var(--info); }
+.strategy-action { color: var(--text-secondary); font-size: var(--text-sm); }
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }

@@ -1,13 +1,14 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Map, Users, ArrowLeftRight, Download, Vote, ChevronRight } from "lucide-react";
+import { Search, Map, Users, ArrowLeftRight, Download, Vote, ChevronRight, Target } from "lucide-react";
 import { LogOut } from "lucide-react";
 
 const navItems = [
   { href: "/", icon: Search, label: "Busca" },
   { href: "/mapa", icon: Map, label: "Mapa Eleitoral" },
   { href: "/candidatos", icon: Users, label: "Candidatos" },
+  { href: "/estrategia", icon: Target, label: "Estratégia 2026" },
   { href: "/comparar", icon: ArrowLeftRight, label: "Comparador" },
   { href: "/exportar", icon: Download, label: "Exportações" },
 ];
