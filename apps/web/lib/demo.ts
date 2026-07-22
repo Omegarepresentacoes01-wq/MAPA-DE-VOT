@@ -81,3 +81,10 @@ export const DEMO_COMPARISON_ROWS = [
   { territory_nome: "PSD — São Paulo", votos_a: 68450, votos_b: 59120, variacao_absoluta: -9330, variacao_percentual: -13.6 },
   { territory_nome: "PSOL — São Paulo", votos_a: 48400, votos_b: 56270, variacao_absoluta: 7870, variacao_percentual: 16.3 },
 ];
+
+export const DEMO_MUNICIPALITIES: Record<string, { nome: string; uf: string; populacao: number; votos_validos: number }> = {
+  "3550308": { nome: "São Paulo", uf: "SP", populacao: 11451999, votos_validos: 6582400 },
+  "3518800": { nome: "Guarulhos", uf: "SP", populacao: 1296687, votos_validos: 703120 },
+  "3534401": { nome: "Osasco", uf: "SP", populacao: 728615, votos_validos: 403670 },
+  "3547809": { nome: "Santo André", uf: "SP", populacao: 748919, votos_validos: 434200 },
+};

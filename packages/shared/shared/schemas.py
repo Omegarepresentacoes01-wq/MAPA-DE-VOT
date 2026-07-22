@@ -1,5 +1,5 @@
 """
-Schemas Pydantic — contratos da API pública.
+Schemas Pydantic — contratos internos da API.
 Toda resposta da API inclui SourceMeta para rastreabilidade.
 """
 from __future__ import annotations

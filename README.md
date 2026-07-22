@@ -1,6 +1,6 @@
-# Mapa de Voto — Plataforma de Inteligência Eleitoral e Territorial
+# Mapa de Voto — Sistema Privado de Inteligência Eleitoral e Territorial
 
-Plataforma SaaS para consulta, análise e operação eleitoral com base em dados oficiais (TSE, IBGE e fontes complementares).
+Sistema interno para consulta, análise e operação eleitoral com base em dados oficiais (TSE, IBGE e fontes complementares). O acesso será restrito a pessoas autorizadas por login; não há cadastro aberto, assinatura ou oferta de API pública.
 
 ---
 
@@ -77,6 +77,17 @@ Frontend em: http://localhost:3000
 MinIO Console: http://localhost:9001  
 Meilisearch: http://localhost:7700  
 
+### Demonstração local sem Docker
+
+Para testar a interface sem banco ou serviços de infraestrutura, use:
+
+```bash
+make web-install  # apenas na primeira vez
+make web
+```
+
+Abra http://localhost:3000. O sistema mostra dados de demonstração identificados como tal; não há ingestão, persistência ou consulta aos dados oficiais nesse modo.
+
 ---
 
 ## Fontes de dados
@@ -120,6 +131,6 @@ Toda tela analítica exibe o bloco `SourceMeta` com fonte, data de atualização
 ## Roadmap
 
 - **Fase 1 (MVP)**: Busca, Ficha 360, Mapa, Finanças, Comparador, Exportações
-- **Fase 2**: Watchlists, camadas socioeconômicas, API premium
+- **Fase 2**: Gestão interna de usuários, watchlists e camadas socioeconômicas
 - **Fase 3**: CRM político, lideranças, surveys
 - **Fase 4**: IA assistida, monitoramento narrativo

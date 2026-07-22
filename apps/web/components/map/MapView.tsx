@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { Layers, ZoomIn, ZoomOut, RotateCcw, Info } from "lucide-react";
+import { DEMO_MODE } from "@/lib/demo";
 import "./map-view.css";
 
 const LAYERS = [
@@ -14,6 +15,15 @@ const ELECTIONS = [
   { id: "2022-1", label: "2022 — 1º Turno · Presidente" },
   { id: "2022-1-gov", label: "2022 — 1º Turno · Governador" },
 ];
+
+const DEMO_MUNICIPIOS_GEOJSON = {
+  type: "FeatureCollection" as const,
+  features: [
+    { type: "Feature" as const, properties: { nome: "São Paulo", uf: "SP", codigo_ibge: "3550308", populacao: 11451999 }, geometry: { type: "Polygon" as const, coordinates: [[[-46.82, -23.82], [-46.42, -23.82], [-46.42, -23.42], [-46.82, -23.42], [-46.82, -23.82]]] } },
+    { type: "Feature" as const, properties: { nome: "Guarulhos", uf: "SP", codigo_ibge: "3518800", populacao: 1296687 }, geometry: { type: "Polygon" as const, coordinates: [[[-46.62, -23.55], [-46.38, -23.55], [-46.38, -23.32], [-46.62, -23.32], [-46.62, -23.55]]] } },
+    { type: "Feature" as const, properties: { nome: "Rio de Janeiro", uf: "RJ", codigo_ibge: "3304557", populacao: 6211423 }, geometry: { type: "Polygon" as const, coordinates: [[[-43.38, -23.08], [-42.98, -23.08], [-42.98, -22.72], [-43.38, -22.72], [-43.38, -23.08]]] } },
+  ],
+};
 
 export function MapView() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -65,19 +75,25 @@ export function MapView() {
       map.on("load", () => {
         setLoading(false);
 
-        // Camada de municípios via MVT (pg_tileserv)
-        map.addSource("municipios", {
-          type: "vector",
-          tiles: ["/api/v1/maps/tiles/public.territory/{z}/{x}/{y}.mvt"],
-          minzoom: 3,
-          maxzoom: 10,
-        });
+        // Sem API local, usa geometrias demonstrativas; com API, usa MVT do PostGIS.
+        if (DEMO_MODE) {
+          map.addSource("municipios", { type: "geojson", data: DEMO_MUNICIPIOS_GEOJSON });
+        } else {
+          map.addSource("municipios", {
+            type: "vector",
+            tiles: ["/api/v1/maps/tiles/public.territory/{z}/{x}/{y}.mvt"],
+            minzoom: 3,
+            maxzoom: 10,
+          });
+        }
+
+        const sourceLayer = DEMO_MODE ? {} : { "source-layer": "territory" };
 
         map.addLayer({
           id: "municipios-fill",
           type: "fill",
           source: "municipios",
-          "source-layer": "territory",
+          ...sourceLayer,
           paint: {
             "fill-color": "hsla(217,91%,60%,0.15)",
             "fill-opacity": ["interpolate", ["linear"], ["zoom"], 4, 0.5, 8, 0.8],
@@ -88,7 +104,7 @@ export function MapView() {
           id: "municipios-line",
           type: "line",
           source: "municipios",
-          "source-layer": "territory",
+          ...sourceLayer,
           paint: {
             "line-color": "hsla(217,91%,60%,0.5)",
             "line-width": ["interpolate", ["linear"], ["zoom"], 4, 0.3, 8, 0.8, 12, 1.5],
@@ -99,7 +115,7 @@ export function MapView() {
           id: "municipios-hover",
           type: "fill",
           source: "municipios",
-          "source-layer": "territory",
+          ...sourceLayer,
           paint: { "fill-color": "hsla(217,91%,60%,0.4)" },
           filter: ["==", "nome", ""],
         });

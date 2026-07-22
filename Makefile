@@ -5,7 +5,7 @@ COMPOSE = docker compose -f infra/compose/docker-compose.yml --env-file .env
 PYTHON = python
 
 .PHONY: help setup up down logs shell-api shell-db migrate migrate-create \
-        seed-sources ingest-tse-2022 ingest-ibge index-search test lint
+        seed-sources ingest-tse-2022 ingest-ibge index-search test lint web web-install
 
 help: ## Mostra esta ajuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -19,6 +19,12 @@ setup: ## Configuração inicial: copia .env, cria diretórios de dados
 	@cp -n .env.example .env || true
 	@mkdir -p data/raw data/staging
 	@echo "✅ Setup concluído. Edite .env antes de subir os serviços."
+
+web-install: ## Instala as dependências do frontend local
+	@npm --prefix apps/web ci
+
+web: ## Inicia a demonstração local do frontend em http://localhost:3000
+	@npm --prefix apps/web run dev
 
 # ──────────────────────────────────────────────────────────────────
 # Docker
