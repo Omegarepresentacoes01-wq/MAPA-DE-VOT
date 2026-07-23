@@ -9,6 +9,7 @@ import csv
 import gzip
 import io
 import json
+import re
 import sys
 import unicodedata
 import urllib.parse
@@ -26,7 +27,14 @@ IBGE_MUNICIPIOS_URL = "https://servicodados.ibge.gov.br/api/v1/localidades/estad
 
 
 def normalized(value: str) -> str:
-    return "".join(char for char in unicodedata.normalize("NFD", value.upper()) if unicodedata.category(char) != "Mn")
+    # O TSE publica, por exemplo, "D OESTE" e o IBGE usa "D'Oeste".
+    # Mantemos somente caracteres alfanuméricos após retirar acentos para que
+    # esses nomes representem o mesmo município no cruzamento.
+    canonical = re.sub(r"D(?:O)?[ '\u2019]*OESTE", "DOESTE", value.upper())
+    return "".join(
+        char for char in unicodedata.normalize("NFD", canonical)
+        if unicodedata.category(char) != "Mn" and char.isalnum()
+    )
 
 
 def load_json(url: str) -> object:
