@@ -31,6 +31,7 @@ export function MapView() {
   const [uf, setUf] = useState("RO");
   const [office, setOffice] = useState("Governador");
   const [query, setQuery] = useState("");
+  const [expanded, setExpanded] = useState<string | null>(null);
 
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
@@ -77,21 +78,17 @@ export function MapView() {
   }, [candidateId, dataset, mapReady]);
 
   const reset = () => mapInstanceRef.current?.flyTo({ center: [-63.9, -10.9], zoom: 5.25, duration: 650 });
+  const selectedCandidate = dataset?.candidates.find((candidate) => candidate.id === candidateId);
+  const filteredCandidates = dataset?.candidates.filter((candidate) => candidate.nome.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR"))) || [];
+  const topMunicipalities = dataset ? dataset.mapa.features.map((feature) => ({ nome: feature.properties.nome, votos: feature.properties.votos[candidateId] || 0 })).sort((left, right) => right.votos - left.votos).slice(0, 4) : [];
 
   return <div className="electoral-map-shell">
     <div ref={mapRef} className="electoral-map-canvas" aria-label="Mapa eleitoral do Brasil" />
     {loading && <div className="map-load-state"><span /><strong>Preparando mapa eleitoral</strong></div>}
 
     <aside className="map-insight-rail">
-      <div className="map-rail-title"><Target size={18} /><div><strong>Leitura territorial</strong><span>Base oficial ainda não importada</span></div></div>
-      <p>Quando os resultados do TSE forem carregados, esta área mostrará redutos, evolução e oportunidades por município.</p>
-      <div className="map-rail-grid">
-        <button><span>01</span><strong>Onde foi mais forte</strong><small>Ranking de municípios</small></button>
-        <button><span>02</span><strong>Onde perdeu força</strong><small>Comparação entre ciclos</small></button>
-        <button><span>03</span><strong>Meta por território</strong><small>Planejamento de campo</small></button>
-        <button><span>04</span><strong>Comparar candidatos</strong><small>Sobreposição eleitoral</small></button>
-      </div>
-      <div className="map-rail-empty"><Map size={20} /><span>Importe o resultado eleitoral para ativar a análise territorial.</span></div>
+      <div className="map-rail-title"><Target size={18} /><div><strong>Leitura territorial</strong><span>{selectedCandidate ? `${selectedCandidate.nome} · RO 2022` : "Carregando resultado oficial"}</span></div></div>
+      {dataset ? <><p>Ranking real dos municípios para a candidatura selecionada.</p><div className="map-top-municipalities">{topMunicipalities.map((item, index) => <div key={item.nome}><b>{index + 1}</b><span>{item.nome}</span><strong>{number(item.votos)}</strong></div>)}</div><button className="map-rail-link" onClick={() => window.location.assign("/estrategia")}>Levar municípios para estratégia →</button></> : <div className="map-rail-empty"><Map size={20} /><span>Importe o resultado eleitoral para ativar a análise territorial.</span></div>}
     </aside>
 
     <div className="map-toolbar">{controls.map(({ id, label, icon: Icon }) => <button key={id} className={activeControl === id ? "active" : ""} onClick={() => setActiveControl(id)}><Icon size={16} />{label}</button>)}<span /><button aria-label="Aproximar" onClick={() => mapInstanceRef.current?.zoomIn()}><Plus size={17} /></button><button aria-label="Afastar" onClick={() => mapInstanceRef.current?.zoomOut()}><Minus size={17} /></button></div>
@@ -99,16 +96,14 @@ export function MapView() {
     <aside className="map-query-panel">
       <header><div><h1>Mapa Eleitoral</h1><p>Consulta territorial por resultado oficial.</p></div><button onClick={() => setQuery("")} aria-label="Limpar busca">×</button></header>
       <div className="map-query-form">
-        <label>Ano<select value={year} onChange={(event) => setYear(event.target.value)}><option>2022</option><option>2024</option></select></label>
+        <label>Ano<select value={year} onChange={(event) => setYear(event.target.value)}><option>2022</option></select></label>
         <label>UF<select value={uf} onChange={(event) => setUf(event.target.value)}><option>RO</option></select></label>
-        <label>Cargo<select value={office} onChange={(event) => setOffice(event.target.value)}><option>Governador</option><option>Presidente</option><option>Senador</option><option>Deputado Federal</option></select></label>
-        <label>Turno<select><option>1º Turno</option><option>2º Turno</option></select></label>
+        <label>Cargo<select value={office} onChange={(event) => setOffice(event.target.value)}><option>Governador</option></select></label>
+        <label>Turno<select><option>1º Turno</option></select></label>
       </div>
-      <div className="map-search-input"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar candidato ou município" /></div>
-      {dataset ? <section className="map-data-state map-data-loaded"><div><Check size={18} /><strong>Resultado oficial carregado</strong></div><p>{dataset.meta.fonte} · {dataset.meta.cargo} · {dataset.meta.turno}º turno · {dataset.meta.uf}</p><label className="map-candidate-select">Candidato<select value={candidateId} onChange={(event) => setCandidateId(event.target.value)}>{dataset.candidates.map((candidate) => <option key={candidate.id} value={candidate.id}>{candidate.nome} — {number(candidate.votos)} votos</option>)}</select></label><div className="map-candidate-ranking">{dataset.candidates.slice(0, 3).map((candidate, index) => <button key={candidate.id} onClick={() => setCandidateId(candidate.id)} className={candidate.id === candidateId ? "selected" : ""}><b>{index + 1}</b><span>{candidate.nome}</span><small>{number(candidate.votos)}</small></button>)}</div></section> : <section className="map-data-state"><div><Layers3 size={18} /><strong>Nenhum resultado carregado</strong></div><p>{datasetError || "Importe uma base oficial do TSE para colorir o mapa e calcular os indicadores."}</p><button onClick={() => window.location.assign("/exportar")}><SlidersHorizontal size={15} /> Ver importações</button></section>}
-      <div className="map-accordion"><span><BarChart3 size={16} /> Resumo de desempenho</span><ChevronDown size={16} /></div>
-      <div className="map-accordion"><span><Map size={16} /> Camadas territoriais</span><ChevronDown size={16} /></div>
-      <div className="map-accordion"><span><Target size={16} /> Estratégia e metas</span><ChevronDown size={16} /></div>
+      <div className="map-search-input"><Search size={17} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar candidato carregado" /></div>
+      {dataset ? <section className="map-data-state map-data-loaded"><div><Check size={18} /><strong>Resultado oficial carregado</strong></div><p>{dataset.meta.fonte} · {dataset.meta.cargo} · {dataset.meta.turno}º turno · {dataset.meta.uf}</p><label className="map-candidate-select">Candidato<select value={candidateId} onChange={(event) => setCandidateId(event.target.value)}>{filteredCandidates.map((candidate) => <option key={candidate.id} value={candidate.id}>{candidate.nome} — {number(candidate.votos)} votos</option>)}</select></label><div className="map-candidate-ranking">{filteredCandidates.slice(0, 3).map((candidate, index) => <button key={candidate.id} onClick={() => setCandidateId(candidate.id)} className={candidate.id === candidateId ? "selected" : ""}><b>{index + 1}</b><span>{candidate.nome}</span><small>{number(candidate.votos)}</small></button>)}</div></section> : <section className="map-data-state"><div><Layers3 size={18} /><strong>Nenhum resultado carregado</strong></div><p>{datasetError || "Importe uma base oficial do TSE para colorir o mapa e calcular os indicadores."}</p><button onClick={() => window.location.assign("/exportar")}><SlidersHorizontal size={15} /> Ver importações</button></section>}
+      {[{ id: "resumo", icon: BarChart3, label: "Resumo de desempenho", content: selectedCandidate ? `${selectedCandidate.nome}: ${number(selectedCandidate.votos)} votos válidos no recorte estadual.` : "Selecione uma candidatura." }, { id: "camadas", icon: Map, label: "Camadas territoriais", content: "Municípios de Rondônia: geometria oficial do IBGE cruzada com a votação do TSE." }, { id: "estrategia", icon: Target, label: "Estratégia e metas", content: "Use o ranking territorial à esquerda para iniciar o planejamento de campo." }].map(({ id, icon: Icon, label, content }) => <div className={`map-accordion ${expanded === id ? "open" : ""}`} key={id}><button onClick={() => setExpanded((current) => current === id ? null : id)}><span><Icon size={16} /> {label}</span><ChevronDown size={16} /></button>{expanded === id && <p>{content}</p>}</div>)}
     </aside>
     <div className="map-legend"><strong>Votos por município</strong><span><i /> {dataset ? "Resultado TSE 2022 · RO" : "Aguardando base oficial TSE"}</span></div>
     <div className="map-actions"><button onClick={reset}><RotateCcw size={15} /> Centralizar</button><button><Check size={15} /> Configurações</button></div>
