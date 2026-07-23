@@ -4,12 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { BarChart3, Check, ChevronDown, Layers3, Map, Minus, Plus, RotateCcw, Search, SlidersHorizontal, Target } from "lucide-react";
 import "./map-view.css";
 
-const controls = [
-  { id: "busca", label: "Busca", icon: Search },
-  { id: "analise", label: "Análise", icon: BarChart3 },
-  { id: "camadas", label: "Camadas", icon: Layers3 },
-];
-
 type ElectionDataset = {
   meta: { fonte: string; cargo: string; turno: number; uf: string };
   candidates: Array<{ id: string; nome: string; votos: number }>;
@@ -26,7 +20,6 @@ export function MapView() {
   const [dataset, setDataset] = useState<ElectionDataset | null>(null);
   const [candidateId, setCandidateId] = useState("");
   const [datasetError, setDatasetError] = useState("");
-  const [activeControl, setActiveControl] = useState("busca");
   const [year, setYear] = useState("2022");
   const [uf, setUf] = useState("RO");
   const [office, setOffice] = useState("Governador");
@@ -82,6 +75,10 @@ export function MapView() {
   const filteredCandidates = dataset?.candidates.filter((candidate) => candidate.nome.toLocaleLowerCase("pt-BR").includes(query.toLocaleLowerCase("pt-BR"))) || [];
   const topMunicipalities = dataset ? dataset.mapa.features.map((feature) => ({ nome: feature.properties.nome, votos: feature.properties.votos[candidateId] || 0 })).sort((left, right) => right.votos - left.votos).slice(0, 4) : [];
 
+  useEffect(() => {
+    if (filteredCandidates.length && !filteredCandidates.some((candidate) => candidate.id === candidateId)) setCandidateId(filteredCandidates[0].id);
+  }, [candidateId, filteredCandidates]);
+
   return <div className="electoral-map-shell">
     <div ref={mapRef} className="electoral-map-canvas" aria-label="Mapa eleitoral do Brasil" />
     {loading && <div className="map-load-state"><span /><strong>Preparando mapa eleitoral</strong></div>}
@@ -91,7 +88,7 @@ export function MapView() {
       {dataset ? <><p>Ranking real dos municípios para a candidatura selecionada.</p><div className="map-top-municipalities">{topMunicipalities.map((item, index) => <div key={item.nome}><b>{index + 1}</b><span>{item.nome}</span><strong>{number(item.votos)}</strong></div>)}</div><button className="map-rail-link" onClick={() => window.location.assign("/estrategia")}>Levar municípios para estratégia →</button></> : <div className="map-rail-empty"><Map size={20} /><span>Importe o resultado eleitoral para ativar a análise territorial.</span></div>}
     </aside>
 
-    <div className="map-toolbar">{controls.map(({ id, label, icon: Icon }) => <button key={id} className={activeControl === id ? "active" : ""} onClick={() => setActiveControl(id)}><Icon size={16} />{label}</button>)}<span /><button aria-label="Aproximar" onClick={() => mapInstanceRef.current?.zoomIn()}><Plus size={17} /></button><button aria-label="Afastar" onClick={() => mapInstanceRef.current?.zoomOut()}><Minus size={17} /></button></div>
+    <div className="map-toolbar"><span className="map-toolbar-label">Navegação do mapa</span><button aria-label="Aproximar" title="Aproximar" onClick={() => mapInstanceRef.current?.zoomIn()}><Plus size={17} /></button><button aria-label="Afastar" title="Afastar" onClick={() => mapInstanceRef.current?.zoomOut()}><Minus size={17} /></button></div>
 
     <aside className="map-query-panel">
       <header><div><h1>Mapa Eleitoral</h1><p>Consulta territorial por resultado oficial.</p></div><button onClick={() => setQuery("")} aria-label="Limpar busca">×</button></header>
@@ -106,6 +103,6 @@ export function MapView() {
       {[{ id: "resumo", icon: BarChart3, label: "Resumo de desempenho", content: selectedCandidate ? `${selectedCandidate.nome}: ${number(selectedCandidate.votos)} votos válidos no recorte estadual.` : "Selecione uma candidatura." }, { id: "camadas", icon: Map, label: "Camadas territoriais", content: "Municípios de Rondônia: geometria oficial do IBGE cruzada com a votação do TSE." }, { id: "estrategia", icon: Target, label: "Estratégia e metas", content: "Use o ranking territorial à esquerda para iniciar o planejamento de campo." }].map(({ id, icon: Icon, label, content }) => <div className={`map-accordion ${expanded === id ? "open" : ""}`} key={id}><button onClick={() => setExpanded((current) => current === id ? null : id)}><span><Icon size={16} /> {label}</span><ChevronDown size={16} /></button>{expanded === id && <p>{content}</p>}</div>)}
     </aside>
     <div className="map-legend"><strong>Votos por município</strong><span><i /> {dataset ? "Resultado TSE 2022 · RO" : "Aguardando base oficial TSE"}</span></div>
-    <div className="map-actions"><button onClick={reset}><RotateCcw size={15} /> Centralizar</button><button><Check size={15} /> Configurações</button></div>
+    <div className="map-actions"><button onClick={reset}><RotateCcw size={15} /> Centralizar</button></div>
   </div>;
 }

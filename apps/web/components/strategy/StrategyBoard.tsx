@@ -1,65 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { CheckCircle2, CircleDot, MapPinned, Target, TrendingDown, TrendingUp } from "lucide-react";
-import { DEMO_STRATEGY_2026, StrategyPriority } from "@/lib/demo";
+import { useEffect, useMemo, useState } from "react";
+import { AlertCircle, CheckCircle2, MapPinned, Target } from "lucide-react";
+import { formatNumber, loadOfficialDataset, OfficialDataset } from "@/components/local/official-data";
 
-const priorityLabel: Record<StrategyPriority, string> = { alta: "Prioridade alta", media: "Prioridade média", manutencao: "Manutenção" };
-
-function number(value: number) { return new Intl.NumberFormat("pt-BR").format(value); }
+type Plan = { priority: "alta" | "media" | "manutencao"; goal: string; action: string; reviewed: boolean };
+const storageKey = "mapa-voto-territorial-plan-v1";
+const blankPlan: Plan = { priority: "media", goal: "", action: "", reviewed: false };
 
 export function StrategyBoard() {
-  const [priority, setPriority] = useState<"todas" | StrategyPriority>("todas");
-  const [completed, setCompleted] = useState<string[]>([]);
-  const territories = useMemo(
-    () => DEMO_STRATEGY_2026.filter((item) => priority === "todas" || item.prioridade === priority),
-    [priority],
-  );
-  const totalMeta = territories.reduce((sum, item) => sum + item.meta, 0);
-  const totalPotential = territories.reduce((sum, item) => sum + item.potencial, 0);
-
-  return (
-    <div>
-      <div className="page-header">
-        <h1 style={{ display: "flex", alignItems: "center", gap: ".5rem" }}><Target size={28} style={{ color: "var(--accent)" }} /> Estratégia 2026</h1>
-        <p>Leitura territorial baseada em eleições anteriores para orientar prioridade, meta e acompanhamento de campo.</p>
-      </div>
-
-      <div className="strategy-notice"><MapPinned size={16} /> Dados demonstrativos. Na carga oficial, os indicadores serão calculados com resultados históricos do TSE.</div>
-
-      <div className="grid-3" style={{ margin: "1.25rem 0 1.5rem" }}>
-        <div className="stat-card"><div className="stat-label">Territórios prioritários</div><div className="stat-value">{territories.length}</div><div className="stat-sub">Seleção atual</div></div>
-        <div className="stat-card"><div className="stat-label">Meta de votos</div><div className="stat-value">{number(totalMeta)}</div><div className="stat-sub">Soma das metas territoriais</div></div>
-        <div className="stat-card"><div className="stat-label">Potencial mapeado</div><div className="stat-value">{number(totalPotential)}</div><div className="stat-sub">Referência de planejamento</div></div>
-      </div>
-
-      <section className="card" style={{ padding: 0, overflow: "hidden" }}>
-        <div className="strategy-toolbar">
-          <div><div className="section-title" style={{ marginBottom: ".25rem" }}>Plano territorial</div><p>Classifique, acompanhe e ajuste o plano por município.</p></div>
-          <div className="strategy-filter" role="group" aria-label="Filtrar prioridade">
-            {(["todas", "alta", "media"] as const).map((item) => <button key={item} className={`btn btn-sm ${priority === item ? "btn-primary" : "btn-ghost"}`} onClick={() => setPriority(item)}>{item === "todas" ? "Todas" : priorityLabel[item]}</button>)}
-          </div>
-        </div>
-        <div style={{ overflowX: "auto" }}>
-          <table className="data-table strategy-table">
-            <thead><tr><th>Município</th><th>Prioridade</th><th style={{ textAlign: "right" }}>2022</th><th style={{ textAlign: "right" }}>Última eleição</th><th style={{ textAlign: "right" }}>Variação</th><th style={{ textAlign: "right" }}>Meta 2026</th><th>Próxima ação</th><th /></tr></thead>
-            <tbody>{territories.map((item) => {
-              const positive = item.variacao >= 0;
-              const done = completed.includes(item.codigo);
-              return <tr key={item.codigo}>
-                <td><strong>{item.municipio}</strong><span className="strategy-sub">{item.uf} · potencial {number(item.potencial)}</span></td>
-                <td><span className={`badge strategy-priority ${item.prioridade}`}>{priorityLabel[item.prioridade]}</span></td>
-                <td style={{ textAlign: "right" }}>{number(item.votos2022)}</td>
-                <td style={{ textAlign: "right" }}>{number(item.votos2024)}</td>
-                <td style={{ textAlign: "right", color: positive ? "var(--success)" : "var(--danger)", fontWeight: 700 }}>{positive ? <TrendingUp size={13} /> : <TrendingDown size={13} />} {positive ? "+" : ""}{item.variacao.toFixed(1)}%</td>
-                <td style={{ textAlign: "right", fontWeight: 700 }}>{number(item.meta)}</td>
-                <td><span className="strategy-action">{item.status}</span></td>
-                <td><button className="btn btn-ghost btn-sm" onClick={() => setCompleted((current) => done ? current.filter((code) => code !== item.codigo) : [...current, item.codigo])}>{done ? <><CheckCircle2 size={14} /> Revisado</> : <><CircleDot size={14} /> Revisar</>}</button></td>
-              </tr>;
-            })}</tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-  );
+  const [dataset, setDataset] = useState<OfficialDataset | null>(null);
+  const [candidateId, setCandidateId] = useState("");
+  const [plans, setPlans] = useState<Record<string, Plan>>({});
+  const [error, setError] = useState("");
+  useEffect(() => { try { setPlans(JSON.parse(localStorage.getItem(storageKey) || "{}")); } catch {} loadOfficialDataset().then((data) => { setDataset(data); setCandidateId(data.candidates[0]?.id || ""); }).catch((cause) => setError(cause.message)); }, []);
+  const save = (code: string, changes: Partial<Plan>) => setPlans((current) => { const next = { ...current, [code]: { ...(current[code] || blankPlan), ...changes } }; localStorage.setItem(storageKey, JSON.stringify(next)); return next; });
+  const territories = useMemo(() => dataset ? dataset.mapa.features.map((feature) => ({ code: feature.properties.codigo_ibge, name: feature.properties.nome, votes: feature.properties.votos[candidateId] || 0, total: feature.properties.total, plan: plans[feature.properties.codigo_ibge] || blankPlan })).filter((item) => item.votes > 0).sort((a, b) => b.votes - a.votes) : [], [candidateId, dataset, plans]);
+  const configured = territories.filter((item) => item.plan.goal || item.plan.action).length;
+  return <div><div className="page-header"><h1 style={{ display: "flex", alignItems: "center", gap: ".5rem" }}><Target size={28} style={{ color: "var(--accent)" }} /> Estratégia territorial</h1><p>Planejamento local baseado no resultado oficial. Metas e ações só aparecem depois que sua equipe as preenche.</p></div>
+    {error ? <div className="card"><AlertCircle color="var(--warning)" /> {error}</div> : !dataset ? <div className="card">Carregando base oficial…</div> : <><div className="card" style={{ marginBottom: "1rem" }}><label className="field-label">Candidatura usada como referência<select className="input-field" value={candidateId} onChange={(event) => setCandidateId(event.target.value)}>{dataset.candidates.map((candidate) => <option key={candidate.id} value={candidate.id}>{candidate.nome} — {formatNumber(candidate.votos)} votos</option>)}</select></label></div><div className="grid-3" style={{ marginBottom: "1.5rem" }}><div className="stat-card"><div className="stat-label">Municípios com resultado</div><div className="stat-value">{territories.length}</div><div className="stat-sub">Base TSE 2022</div></div><div className="stat-card"><div className="stat-label">Planos preenchidos</div><div className="stat-value">{configured}</div><div className="stat-sub">Dados da sua equipe</div></div><div className="stat-card"><div className="stat-label">Itens revisados</div><div className="stat-value">{territories.filter((item) => item.plan.reviewed).length}</div><div className="stat-sub">Controle local</div></div></div><section className="card" style={{ padding: 0, overflow: "hidden" }}><div className="section-title" style={{ padding: "1rem" }}><MapPinned size={17} /> Plano por município</div><div style={{ overflowX: "auto" }}><table className="data-table"><thead><tr><th>Município</th><th style={{ textAlign: "right" }}>Votos 2022</th><th>Prioridade</th><th>Meta 2026</th><th>Próxima ação</th><th /></tr></thead><tbody>{territories.map((item) => <tr key={item.code}><td><strong>{item.name}</strong><span className="strategy-sub">{item.total ? `${((item.votes / item.total) * 100).toFixed(1)}% dos válidos locais` : ""}</span></td><td style={{ textAlign: "right" }}>{formatNumber(item.votes)}</td><td><select className="input-field" value={item.plan.priority} onChange={(event) => save(item.code, { priority: event.target.value as Plan["priority"] })}><option value="alta">Alta</option><option value="media">Média</option><option value="manutencao">Manutenção</option></select></td><td><input className="input-field" inputMode="numeric" placeholder="Definir" value={item.plan.goal} onChange={(event) => save(item.code, { goal: event.target.value })} /></td><td><input className="input-field" placeholder="Definir ação" value={item.plan.action} onChange={(event) => save(item.code, { action: event.target.value })} /></td><td><button className="btn btn-ghost btn-sm" onClick={() => save(item.code, { reviewed: !item.plan.reviewed })}>{item.plan.reviewed ? <><CheckCircle2 size={14} /> Revisado</> : "Revisar"}</button></td></tr>)}</tbody></table></div></section></>}</div>;
 }
